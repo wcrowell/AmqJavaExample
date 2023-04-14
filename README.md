@@ -9,6 +9,10 @@ Git (tested with 2.39.2)
 Java 1.8 (tested with OpenJDK 1.8.0_362)
 ActiveMQ Server (tested with 5.18.0, but example uses 5.16.6 due to Java 1.8 requirement)
 
+Description of lab goes here…
+
+Start ActiveMQ: <code>${ACTIVEMQ_HOME}/bin/activemq start</code>
+
 git clone https://github.com/wcrowell/AmqJavaExample
 
 Set JAVA_HOME:
@@ -49,4 +53,4 @@ Run: activemq dstat
 Then show a producer has connected for the queue.
 
 
-![image](https://user-images.githubusercontent.com/18705165/232038286-cdf3a970-03e4-45e7-bcb0-063f93b2909b.png)
+![image](https://user-images.githubusercontent.com/18705165/232038752-8d87576c-6ca9-4fb5-8c95-abc1c2142f7d.png)
