@@ -33,26 +33,23 @@ java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.Consu
 
 Run: <code>activemq dstat</code>
 
-Show 2 consumers connected to the queue.
+Verify 2 consumers are connected to the queue.
 
 To run the producer: 
 <code>java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ProducerRunner</code>
 
 Run: <code>activemq dstat</code>
 
-Show that no producer has yet connected to the broker until data is sent.  It is waiting for data to be sent.
+No producer has yet connected to the broker until data is sent.  It is waiting for data to be sent.
 
 Type something into the producer window.
 
-Show consumer 1 got it.
+Verify consumer 1 got the message.
 
 Type something again into the producer window.
 
-Show consumer 2 got it.
+Verify consumer 2 got the message.
 
 Run: <code>activemq dstat<code>
 
-Then show a producer has connected for the queue.
-
-
-![image](https://user-images.githubusercontent.com/18705165/232038752-8d87576c-6ca9-4fb5-8c95-abc1c2142f7d.png)
+Output shows a producer has connected for the queue.
