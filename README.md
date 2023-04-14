@@ -50,6 +50,6 @@ Type something again into the producer window.
 
 Verify consumer 2 got the message.
 
-Run: <code>activemq dstat<code>
+Run: <code>activemq dstat</code>
 
 Output shows a producer has connected for the queue.
