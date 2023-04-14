@@ -13,30 +13,32 @@ Description of lab goes here…
 
 Start ActiveMQ: <code>${ACTIVEMQ_HOME}/bin/activemq start</code>
 
-git clone https://github.com/wcrowell/AmqJavaExample
+<code>git clone https://github.com/wcrowell/AmqJavaExample</code>
 
 Set JAVA_HOME:
 
 MacOS:
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
+<code>export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home</code>
 Windows (unless already set in Control Panel > System > Advanced system settings > Advanced > Environment Variables):
-setx /m JAVA_HOME "C:\Program Files\Java\jdk1.8.0"
+<code>setx /m JAVA_HOME "C:\Program Files\Java\jdk1.8.0"</code>
 
-mvn clean install
+<code>mvn clean install</code>
 
 Fire up 2 consumers in separate command line windows:
 
+<code>
 java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ConsumerRunner
 java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ConsumerRunner
+</code>
 
-Run: activemq dstat
+Run: <code>activemq dstat</code>
 
 Show 2 consumers connected to the queue.
 
 To run the producer: 
-java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ProducerRunner
+<code>java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ProducerRunner</code>
 
-Run: activemq dstat
+Run: <code>activemq dstat</code>
 
 Show that no producer has yet connected to the broker until data is sent.  It is waiting for data to be sent.
 
@@ -48,7 +50,7 @@ Type something again into the producer window.
 
 Show consumer 2 got it.
 
-Run: activemq dstat
+Run: <code>activemq dstat<code>
 
 Then show a producer has connected for the queue.
 
