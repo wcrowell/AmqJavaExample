@@ -75,18 +75,20 @@ public class Consumer implements Runnable, MessageListener {
 
                     ps.printf("Message received: %s%n", text);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSS");
-                    Date now = new Date();
-                    String date = sdf.format(now);
+                    if (message.getJMSReplyTo() != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss.SSS");
+                        Date now = new Date();
+                        String date = sdf.format(now);
 
-                    String response = String.format("confirming receipt of %s at time %s", text,
-                            date);
-                    responseMessage.setText(response);
+                        String response = String.format("confirming receipt of %s at time %s", text,
+                                date);
+                        responseMessage.setText(response);
 
-                    responseMessage.setJMSCorrelationID(message.getJMSCorrelationID());
-                    ps.printf("Sending back: %s to %s %s\n%n", response, message.getJMSReplyTo(),
-                            message.getJMSCorrelationID());
-                    producer.send(message.getJMSReplyTo(), responseMessage);
+                        responseMessage.setJMSCorrelationID(message.getJMSCorrelationID());
+                        ps.printf("Sending back: %s to %s %s\n%n", response, message.getJMSReplyTo(),
+                                message.getJMSCorrelationID());
+                        producer.send(message.getJMSReplyTo(), responseMessage);
+                    }
                 }
             } catch (JMSException e) {
                 e.printStackTrace();
