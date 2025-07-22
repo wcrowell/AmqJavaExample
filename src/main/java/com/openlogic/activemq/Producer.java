@@ -1,140 +1,145 @@
 package com.openlogic.activemq;
 
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
 
-import javax.jms.Connection;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
+import jakarta.jms.Connection;
+import jakarta.jms.DeliveryMode;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageListener;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
+import jakarta.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class Producer implements Runnable, MessageListener {
-	private Connection connection;
-	private Session session;
-	private MessageProducer producer;
-	private MessageConsumer consumer;
+    private Connection connection;
+    private Session session;
+    private MessageProducer producer;
+    private MessageConsumer consumer;
 
-	private static final String CONNECTION_STRING = "tcp://localhost:61616";
-	private static final String QUEUE_NAME = "queue1";
+    private static final boolean transacted = false;
+    private static final int ackMode = Session.AUTO_ACKNOWLEDGE;
 
-	private static final boolean transacted = false;
-	private static final int ackMode = Session.AUTO_ACKNOWLEDGE;
+    private boolean exit = false;
 
-	private boolean exit = false;
+    private Scanner input;
+    private final PrintStream ps = System.out;
 
-	private Scanner input;
-	private PrintStream ps = System.out;
-	
-	public void sendData(String data) {
-		ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(CONNECTION_STRING);
-		Destination adminQueue = null;
-		Destination destination = null;
+    public void sendData(String data) {
+        try (InputStream input = Consumer.class.getClassLoader().getResourceAsStream("amq.properties")) {
+            Properties p = new Properties();
+            p.load(input);
 
-		if (connection == null) {
-			try {
-				connection = connectionFactory.createConnection();
-				connection.start();
-			} catch (JMSException e) {
-				e.printStackTrace();
-			}
-		}
+            String brokerURL = p.getProperty("brokerUrl");
+            String queueName = p.getProperty("queue");
 
-		try {
-			if (session == null) {
-				session = connection.createSession(transacted, ackMode);
-				adminQueue = session.createQueue(QUEUE_NAME);
-				producer = session.createProducer(adminQueue);
-			}
+            ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+            Destination adminQueue = null;
+            Destination destination = null;
 
-			producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            if (connection == null) {
+                try {
+                    connection = connectionFactory.createConnection();
+                    connection.start();
+                } catch (JMSException e) {
+                    e.printStackTrace();
+                }
+            }
 
-			destination = session.createTemporaryQueue();
-			consumer = session.createConsumer(destination);
+            if (session == null) {
+                session = connection.createSession(transacted, ackMode);
+                adminQueue = session.createQueue(queueName);
+                producer = session.createProducer(adminQueue);
+            }
 
-			consumer.setMessageListener(this);
+            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
-			TextMessage message = session.createTextMessage();
-			message.setText(data);
-			message.setJMSReplyTo(destination);
+            destination = session.createTemporaryQueue();
+            consumer = session.createConsumer(destination);
 
-			String correlationId = createRandomString();
-			message.setJMSCorrelationID(correlationId);
+            consumer.setMessageListener(this);
 
-			ps.println(String.format("Sending: %s", data));
-			producer.send(message);
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
-	}
+            TextMessage message = session.createTextMessage();
+            message.setText(data);
+            message.setJMSReplyTo(destination);
 
-	private String createRandomString() {
-		Random random = new Random(System.currentTimeMillis());
-		long randomLong = random.nextLong();
-		return String.valueOf(randomLong);
-	}
+            String correlationId = createRandomString();
+            message.setJMSCorrelationID(correlationId);
 
-	@Override
-	public void run() {
-		String data = null;
+            ps.printf("Sending: %s%n", data);
+            producer.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		while (!exit) {
-			if (input == null) {
-				input = new Scanner(System.in);
-			}
+    private String createRandomString() {
+        Random random = new Random(System.currentTimeMillis());
+        long randomLong = random.nextLong();
+        return String.valueOf(randomLong);
+    }
 
-			ps.println("Enter data to send (type 'exit' to exit)");
-			data = String.format("%s", input.nextLine());
+    @Override
+    public void run() {
+        String data = null;
 
-			ps.println(String.format("Data to send is: %s", data));
-			sendData(data);
+        while (!exit) {
+            if (input == null) {
+                input = new Scanner(System.in);
+            }
 
-			if (data.contains("exit")) {
-				exit = true;
-			}
-		}
-	}
+            ps.println("Enter data to send (type 'exit' to exit)");
+            data = String.format("%s", input.nextLine());
 
-	public boolean isExit() {
-		return exit;
-	}
+            ps.printf("Data to send is: %s%n", data);
+            sendData(data);
 
-	public void close() {
-		try {
-			if (connection != null) {
-				connection.close();
-			}
-			if (session != null) {
-				session.close();
-			}
-			if (producer != null) {
-				producer.close();
-			}
-			if (consumer != null) {
-				consumer.close();
-			}
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
-	}
+            if (data.contains("exit")) {
+                exit = true;
+            }
+        }
+    }
 
-	@Override
-	public void onMessage(Message message) {
-		if (message instanceof TextMessage) {
-			try {
-				TextMessage textMessage = (TextMessage) message;
-				ps.println(String.format("Message text from consumer: %s\n", textMessage.getText()));
-			} catch (JMSException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    public boolean isExit() {
+        return exit;
+    }
+
+    public void close() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+            if (session != null) {
+                session.close();
+            }
+            if (producer != null) {
+                producer.close();
+            }
+            if (consumer != null) {
+                consumer.close();
+            }
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        if (message instanceof TextMessage) {
+            try {
+                TextMessage textMessage = (TextMessage) message;
+                ps.printf("Message text from consumer: %s\n%n", textMessage.getText());
+            } catch (JMSException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -4,10 +4,10 @@ A simple producer and consumer written in Java running on ActiveMQ.
 
 Requirements:
 
-Apache Maven (tested with 3.8.7)
-Git (tested with 2.39.2)
-Java 1.8 (tested with OpenJDK 1.8.0_362)
-ActiveMQ Server (tested with 5.18.0, but example uses 5.16.6 due to Java 1.8 requirement)
+Apache Maven (tested with 3.9.3)
+Git (tested with 2.47.1)
+Java 17 (tested with OpenJDK 17.0.15+6-LTS)
+ActiveMQ Server (tested with 6.1.7
 
 Description of lab goes here…
 
@@ -18,17 +18,17 @@ Start ActiveMQ: <code>${ACTIVEMQ_HOME}/bin/activemq start</code>
 Set JAVA_HOME:
 
 MacOS:
-<code>export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home</code>
+<code>export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home</code>
 Windows (unless already set in Control Panel > System > Advanced system settings > Advanced > Environment Variables):
-<code>setx /m JAVA_HOME "C:\Program Files\Java\jdk1.8.0"</code>
+<code>setx /m JAVA_HOME "C:\Program Files\Java\jdk-17"</code>
 
 <code>mvn clean install</code>
 
 Fire up 2 consumers in separate command line windows:
 
 <code>
-java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ConsumerRunner
-java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ConsumerRunner
+java -cp ./target/AmqJavaExample-0.0.2-SNAPSHOT.jar com.openlogic.activemq.ConsumerRunner
+java -cp ./target/AmqJavaExample-0.0.2-SNAPSHOT.jar com.openlogic.activemq.ConsumerRunner
 </code>
 
 Run: <code>activemq dstat</code>
@@ -36,7 +36,7 @@ Run: <code>activemq dstat</code>
 Verify 2 consumers are connected to the queue.
 
 To run the producer: 
-<code>java -cp ./target/AmqJavaExample-0.0.1-SNAPSHOT.jar com.openlogic.activemq.ProducerRunner</code>
+<code>java -cp ./target/AmqJavaExample-0.0.2-SNAPSHOT.jar com.openlogic.activemq.ProducerRunner</code>
 
 Run: <code>activemq dstat</code>
 
